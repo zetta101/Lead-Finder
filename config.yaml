@@ -1,0 +1,165 @@
+# Towns/cities to search. Each one gets geocoded (Nominatim) and then
+# searched with Overpass for the industries below.
+locations:
+  - London
+
+# Industry / trade keywords. See leadfinder/discovery.py:INDUSTRY_TAG_MAP for
+# how each keyword maps to OpenStreetMap tags.
+industries:
+  - plumber
+  - electrician
+  - builder
+  - roofer
+  - landscaper
+  - garage
+  - mechanic
+  - accountant
+  - solicitor
+  - estate agent
+  - cafe
+  - restaurant
+  - takeaway
+  - pub
+  - hairdresser
+  - beauty salon
+  - charity
+  - cleaner
+  - carpenter
+  - painter
+  - florist
+  - bakery
+  - dentist
+  - vet
+  - gym
+
+# Maximum number of businesses to pull per (location x industry) search.
+max_businesses_per_search: 200
+
+# A lead only gets a screenshot if its lead_score is >= this value
+# (or another "interesting" condition in run.py is met).
+minimum_lead_score_for_screenshot: 60
+
+# Politeness delay (seconds) between outbound HTTP requests to any single
+# external host (Nominatim, Overpass, business websites, Companies House...).
+request_delay_seconds: 3
+
+# Per-request timeout when fetching a website or API.
+website_timeout_seconds: 20
+
+# How many days before a previously-scanned website is re-checked.
+# Discovery/dedup still runs every time; this only controls re-scanning.
+website_rescan_interval_days: 14
+
+# Radius (metres) used for the Overpass "around" search from each
+# geocoded location centre.
+search_radius_metres: 100
+
+# Max number of internal pages (home + contact/about) crawled per website
+# when looking for contact details.
+max_pages_per_website: 3
+
+# Business names containing any of these (case-insensitive) are treated as
+# national/large chains and skipped - this tool targets small local businesses.
+national_chain_keywords:
+  - mcdonald
+  - kfc
+  - burger king
+  - starbucks
+  - costa coffee
+  - greggs
+  - subway
+  - domino
+  - pizza hut
+  - tesco
+  - sainsbury
+  - asda
+  - morrisons
+  - aldi
+  - lidl
+  - wickes
+  - screwfix
+  - toolstation
+  - b&q
+  - homebase
+  - travelodge
+  - premier inn
+  - halfords
+  - specsavers
+  - vodafone
+  - o2
+  - ee store
+  - three store
+  - pizza express
+  - nando
+
+# Companies House integration is entirely optional. Set the
+# COMPANIES_HOUSE_API_KEY environment variable to enable it - the program
+# works fine without it (companies_house fields are simply left blank).
+companies_house:
+  enabled: true
+  min_name_match_score: 0.72
+
+# Scoring weights - tweak these to change how leads are ranked.
+# All values are points added to (or, if negative, subtracted from) the
+# lead score, which is clamped to 0-100.
+scoring:
+  lead:
+    no_website: 70
+    website_unavailable: 65
+    very_poor_mobile: 25
+    very_slow_website: 20
+    no_https: 20
+    broken_internal_links: 15
+    outdated_indicators: 15
+    no_contact_form: 10
+    no_domain_email: 10
+    poor_accessibility: 10
+    missing_title_or_meta: 5
+    uses_free_email_provider: 15
+    website_no_domain_email_bonus: 10
+    no_website_free_email_bonus: 10
+    professional_modern_website: -40
+  website:
+    # Website score starts at 100 and these are deducted for problems found.
+    no_https_penalty: 20
+    https_redirect_broken_penalty: 10
+    missing_title_penalty: 8
+    missing_meta_description_penalty: 6
+    no_viewport_meta_penalty: 12
+    mobile_overflow_penalty: 12
+    slow_load_penalty: 15
+    very_slow_load_penalty: 10
+    broken_internal_link_penalty_each: 4
+    broken_internal_link_penalty_max: 20
+    broken_social_link_penalty_each: 3
+    broken_social_link_penalty_max: 9
+    no_favicon_penalty: 4
+    no_contact_form_penalty: 8
+    no_tel_link_penalty: 5
+    no_email_link_penalty: 5
+    no_cta_penalty: 6
+    outdated_copyright_penalty: 8
+    mixed_content_penalty: 10
+    large_images_penalty_each: 3
+    large_images_penalty_max: 9
+    no_sitemap_penalty: 3
+    no_robots_penalty: 2
+
+# Performance thresholds used by the website checker.
+performance:
+  slow_load_seconds: 4.0
+  very_slow_load_seconds: 7.0
+  large_image_bytes: 500000
+  outdated_copyright_years_behind: 3
+
+# Playwright screenshot viewport sizes.
+screenshots:
+  desktop_width: 1440
+  desktop_height: 900
+  mobile_width: 390
+  mobile_height: 844
+
+# HTTP User-Agent used for all requests. Please keep this identifiable and
+# honest - it is a well-behaved research/prospecting tool, not a scraper
+# pretending to be a browser.
+user_agent: "LeadFinder/1.0 (+small business web-design lead research; contact via operator)"
