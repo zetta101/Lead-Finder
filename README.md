@@ -1,4 +1,4 @@
-#Lead Finder
+Lead Finder
 
 Finds small UK businesses in towns you pick, checks whether they have a website
 (and how good it is), pulls whatever contact details are publicly listed, and
