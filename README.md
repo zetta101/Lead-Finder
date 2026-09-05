@@ -3,27 +3,26 @@ Lead Finder
 Finds small UK businesses in towns you pick, checks whether they have a website
 (and how good it is), pulls whatever contact details are publicly listed, and
 scores each one as a potential web design / hosting lead. Runs locally on
-Windows, writes everything to SQLite, and spits out an Excel workbook you can
-actually read.
+Windows, writes everything to SQLite, and spits out an Excel workbook that's easy to navigate.
 
-Costs nothing to run. No paid APIs, nothing in the cloud, no accounts to sign
+No paid APIs, locally ran and no accounts to sign
 up for. It doesn't email anyone either — it just builds you a list to look
 through yourself.
 
 ## What it actually does
 
 1. Reads a list of towns + trade/industry keywords from `config.yaml`
-2. Looks up businesses matching those in OpenStreetMap (free, no key needed)
+2. Looks up businesses matching those in OpenStreetMap
 3. Skips anything it's already got in the database recently
-4. Tries to find/verify each business's real website
-5. Pulls public email addresses, phone numbers, contact page links
+4. Tries to find/verify each business's real website (not working amazing - needs work)
+5. Pulls public email addresses, phone numbers, contact page links (again doesn't work amazing - needs work)
 6. Loads the site in a headless browser and checks the basics — HTTPS, mobile
    layout, load time, broken links, contact form, that sort of thing
 7. Scores it twice: how good the *website* is, and how good a *lead* it is
-   (these are basically inverses of each other — a bad website = a good lead)
-8. Optionally cross-checks Companies House if you've set an API key
+   (a bad website = a good lead)
+8. Optionally cross-checks Companies House if you've set an API key (buggy - needs work)
 9. Saves everything, exports to `output/leads.xlsx`, screenshots the
-   interesting ones, prints a summary
+   interesting ones, prints a summary (need to add ability to accept cookies etc before screenshot)
 
 ## Setup
 
@@ -34,14 +33,14 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
+Edit `config.yaml` first if you want different towns/industries than the
+default (it ships pointed at Torquay with a few trades as a quick test).
+
 Then just:
 
 ```powershell
 python run.py
 ```
-
-Edit `config.yaml` first if you want different towns/industries than the
-default (it ships pointed at Torquay with a few trades as a quick test).
 
 ### Companies House (optional)
 
@@ -67,23 +66,12 @@ python run.py --export-only         # rebuild the Excel file, skip scanning
 python run.py --no-screenshots
 ```
 
-## Running it overnight
-
-Task Scheduler → Create Task → set a daily trigger → action "Start a program":
-
-- Program: `C:\path\to\project\.venv\Scripts\python.exe`
-- Arguments: `run.py`
-- Start in: `C:\path\to\project`
-
-Run it once manually from the Task Scheduler window before trusting it
-unattended.
-
 ## A couple of things worth knowing
 
 OpenStreetMap's tagging for trades (plumbers, electricians, builders...) is
 patchy in a lot of towns — a search can come back with zero results for a
 specific trade even though the tool is working fine, because not every
-tradesperson has bothered to get themselves on the map. Cafes, restaurants,
+tradesperson has put themselves on the map. Cafes, restaurants,
 hairdressers and other shopfront businesses tend to be much better mapped.
 If you want a fuller test run, try `--industry cafe` or similar.
 
@@ -94,7 +82,7 @@ in `logs/leadfinder.log` before assuming there's genuinely nothing there.
 Website guessing (used when no site is listed anywhere) tries a few likely
 domain names based on the business name and only accepts a match if the page
 content actually mentions the business — it won't find every real site, and
-that's by design: better to say "no website found" than guess wrong.
+that's by design: better to say "no website found" than guess wrong. (Could do with some work)
 
 ## Managing a do-not-contact list
 
